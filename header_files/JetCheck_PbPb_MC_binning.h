@@ -29,7 +29,7 @@ const int ntrigbins = 2;
 const int triglims[2] = {0,2};
 
 // pf fractions
-const int npfbins = 100;
+const int npfbins = 10;
 const float pflims[2] = {0.0, 1.0};
 
 // pf multiplicities
@@ -60,13 +60,13 @@ const int nhiBin1 = 6;
 int hiBins[nhiBin1] = {0, 20, 60, 100, 160, 200};
 int hiBinlo[nhiBin] = {0, 20, 60, 100, 160};
 int hiBinhi[nhiBin] = {20, 60, 100, 160, 200};
-TString shiBins[nhiBin] = {"0<hiBin<20", "20<hiBin<60", "60<hiBin<100", "100<hiBin<160", "160<hiBin<200"};
+TString shiBins[nhiBin] = {"0 < hiBin < 20", "20 < hiBin < 60", "60 < hiBin < 100", "100 < hiBin < 160", "160 < hiBin < 200"};
 
 // |eta|
 const int netabins = 3;
 const float etalo[netabins] = {0.0, 0.0, 0.0};
 const float etahi[netabins] = {1.6, 2.4, 5.0};
-TString htitles_byeta[netabins] = {"|#eta|<1.6", "|#eta|<2.4", "|#eta|<5"};
+TString htitles_byeta[netabins] = {"|#eta| < 1.6", "|#eta| < 2.4", "|#eta| < 5"};
 
 // momenta
 const int nmombins[nmom] = {nptbins, nptbins, nhetabins, nphibins};
