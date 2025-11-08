@@ -8,7 +8,7 @@
 
 #include "JetCheck_PbPb_plotting.h"
 
-void JetRecoCheck_Plotting_PbPb_v0_11_8_2025(){
+void JetRecoCheck_Plotting_PbPb_v0(){
 
     // getting rid of legends in hists in root file
     gStyle->SetOptStat(0);
