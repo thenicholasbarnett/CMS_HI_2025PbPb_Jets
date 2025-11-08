@@ -9,7 +9,9 @@
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/JetCheck_PbPb_MC_binning.h"
 
 void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list, TString output){
-// void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2024PbPb_DijetMC.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_4_2025/JetRecoCheck_2024PbPbMC_v0_11_4_2025_id.root"){
+// void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2024PbPb_DijetMC.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_7_2025/JetRecoCheck_2024PbPbMC_11_7_2025.root"){
+// void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2025PbPb_DijetMC_fdamas_cmssw15_1_0_patch1.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_7_2025/JetRecoCheck_2025PbPbMC_11_7_2025_withDM.root"){
+// void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2025PbPb_DijetMC_fdamas_cmssw15_1_0.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_7_2025/JetRecoCheck_2025PbPbMC_11_7_2025_noDM.root"){
 
     // declaring variables //
 
@@ -126,7 +128,7 @@ void JetRecoCheck_PbPb_MC_lxplus_v0(TString input_file_list, TString output){
     // getting jet veto map //
 
     // opening root file with map
-    TString sfVetoMap = "/eos/cms/store/group/phys_heavyions/nbarnett/Summer23BPixPrompt23_RunD_v1.root";
+    TString sfVetoMap = "/eos/cms/store/group/phys_heavyions/nbarnett/Winter25Prompt25_RunCDE.root";
     TFile *fvm = TFile::Open(sfVetoMap,"read");
    
     // getting map as 2d histogram
