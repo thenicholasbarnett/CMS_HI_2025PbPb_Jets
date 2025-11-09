@@ -132,26 +132,6 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
         }
     }
     cout<<"finished getting histograms"<<endl;
-
-    // for(unsigned int b=0; b<netabins; b++){
-    //     for(int t=0; t<nhlTrigs; t++){
-    //         // normalizeh1(hl1hlt_ljtpt_eta[b][t]);
-    //         normalizeh2(hl1hlt_ep_eta[b][t]);
-    //         if((t==nl1Trigs)||(t>nl1Trigs)){continue;}
-    //         // normalizeh1(hl1_ljtpt_eta[b][t]);
-    //         normalizeh2(hl1_ep_eta[b][t]);
-    //     }
-    //     for(unsigned int hb=0; hb<nhiBin; hb++){
-    //         for(int t=0; t<nhlTrigs; t++){
-    //             // normalizeh1(hl1hlt_ljtpt_hibin[b][t][hb]);
-    //             normalizeh2(hl1hlt_ep_hibin[b][t][hb]);
-    //             if((t==nl1Trigs)||(t>nl1Trigs)){continue;}
-    //             // normalizeh1(hl1_ljtpt_hibin[b][t][hb]);
-    //             normalizeh2(hl1_ep_hibin[b][t][hb]);
-    //         }
-    //     }
-    // }
-    // cout<<"histograms normalized"<<endl;
     
     /// Making output file
     TString output="JetTurnOn_Assembled_fdamasDijetMC_11_9_2025.root";
@@ -207,17 +187,13 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
     }
     cout<<"ratios written to output file"<<endl;
 
-    // save_h2f(TH2F *h[netabins][nhlTrigs], int etaindex, int trig_index, TString xtitle, TString ytitle, TString hname, TString htitle)
-    // save_h2f_hibin(TH2F *h[netabins][nhlTrigs][nhiBin], int etaindex, int trig_index, int hibin_index, TString xtitle, TString ytitle, TString hname, TString htitle)
-    // save_gr_alltrig(TGraphAsymmErrors *h[netabins][nhlTrigs], int etaindex, TString xtitle, TString ytitle, TString hname, TString htitle)
-    // save_gr_alltrig_hibin(TGraphAsymmErrors *h[netabins][nhlTrigs][nhiBin], int etaindex, int hibin_index, TString xtitle, TString ytitle, TString hname, TString htitle)
-
     for(unsigned int b=0; b<netabins; b++){
-        save_gr_alltrig(hr_ljtpt_eta, b, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn_inclusive", "");
-        for(int t=0; t<nhlTrigs; t++){save_h2f(hr_ep_eta, b, t, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t], sHLTrigs[t]);}
+        TString sEtaBin = Form("_AbsEta_%.0f_to_%.0f",etalo[b]*10,etahi[b]*10);
+        save_gr_alltrig(hr_ljtpt_eta, b, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn_inclusive"+sEtaBin, "");
+        for(int t=0; t<nhlTrigs; t++){save_h2f(hr_ep_eta, b, t, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+sEtaBin, sHLTrigs[t]);}
         for(unsigned int hb=0; hb<nhiBin; hb++){
-            save_gr_alltrig_hibin(hr_ljtpt_hibin, b, hb, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn"+shiBins[hb], "");
-            for(int t=0; t<nhlTrigs; t++){save_h2f_hibin(hr_ep_hibin, b, t, hb, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+shiBins[hb], sHLTrigs[t]+shiBins[hb]);}
+            save_gr_alltrig_hibin(hr_ljtpt_hibin, b, hb, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn"+htitles_byhibin[hb]+sEtaBin, "");
+            for(int t=0; t<nhlTrigs; t++){save_h2f_hibin(hr_ep_hibin, b, t, hb, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+htitles_byhibin[hb]+sEtaBin, sHLTrigs[t]+shiBins[hb]);}
         }
     }
     cout<<"ratios saved as png files"<<endl;
