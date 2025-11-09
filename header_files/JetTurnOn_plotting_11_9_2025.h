@@ -142,6 +142,7 @@ void save_gr_alltrig(TGraphAsymmErrors *h[netabins][nhlTrigs], int etaindex, TSt
         l->AddEntry(h_c[t],sHLTrigs[t],"l");    
     }
     l->AddEntry((TObject*)0, "akCs4PF", "");
+    l->AddEntry((TObject*)0, htitles_byeta[etaindex], "");
     l->Draw("same");
 
     // saving
@@ -212,9 +213,9 @@ void save_gr_alltrig_hibin(TGraphAsymmErrors *h[netabins][nhlTrigs][nhiBin], int
     for(int t=0; t<nhlTrigs; t++){
         l->AddEntry(h_c[t],sHLTrigs[t],"l");    
     }
-    TString shiBin = Form("%d < hiBin < %d",hiBinlo[hibin_index],hiBinhi[hibin_index]);
-    l->AddEntry((TObject*)0, shiBin, "");
+    l->AddEntry((TObject*)0, htitles_byhibin[hibin_index], "");
     l->AddEntry((TObject*)0, "akCs4PF", "");
+    l->AddEntry((TObject*)0, htitles_byeta[etaindex], "");
     l->Draw("same");
 
     // saving

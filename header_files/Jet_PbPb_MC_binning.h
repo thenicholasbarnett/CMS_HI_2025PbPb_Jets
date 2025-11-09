@@ -79,6 +79,7 @@ int hiBins[nhiBin1] = {0, 20, 60, 100, 160, 200};
 int hiBinlo[nhiBin] = {0, 20, 60, 100, 160};
 int hiBinhi[nhiBin] = {20, 60, 100, 160, 200};
 TString shiBins[nhiBin] = {"0 < hiBin < 20", "20 < hiBin < 60", "60 < hiBin < 100", "100 < hiBin < 160", "160 < hiBin < 200"};
+TString htitles_byhibin[nhiBin] = {"_hiBin_0_to_20", "_hiBin_20_to_60", "_hiBin_60_to_100", "_hiBin_100_to_160", "_hiBin_160_to_200"};
 
 // |eta|
 const int netabins = 3;
