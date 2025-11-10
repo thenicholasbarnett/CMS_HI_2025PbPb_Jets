@@ -16,7 +16,7 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
     gStyle->SetOptStat(0);
 
     // opening the input file
-    TString input="JetTurnOn_2025PbPbMC_11_9_2025_withDM.root";
+    TString input="JetTurnOn_2025PbPbMC_11_10_2025_noDM.root";
     TFile *fi = TFile::Open(input,"read");
     fi->cd();
 
@@ -48,6 +48,8 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
 
     TGraphAsymmErrors* hr_ljtpt_eta[netabins][nhlTrigs];
     TGraphAsymmErrors* hr_ljtpt_hibin[netabins][nhlTrigs][nhiBin];
+    TGraphAsymmErrors* hr_HLT_ljtpt_eta[netabins][nhlTrigs];
+    TGraphAsymmErrors* hr_HLT_ljtpt_hibin[netabins][nhlTrigs][nhiBin];
     TH2F* hr_ep_eta[netabins][nhlTrigs];
     TH2F* hr_ep_hibin[netabins][nhlTrigs][nhiBin];
 
@@ -145,6 +147,9 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
         hr_ljtpt_eta[b][0] = new TGraphAsymmErrors(hl1hlt_ljtpt_eta[b][0],hl1_ljtpt_eta[b][0],"cl=0.683 b(1,1) mode");
         hr_ljtpt_eta[b][1] = new TGraphAsymmErrors(hl1hlt_ljtpt_eta[b][1],hl1_ljtpt_eta[b][0],"cl=0.683 b(1,1) mode");
         hr_ljtpt_eta[b][2] = new TGraphAsymmErrors(hl1hlt_ljtpt_eta[b][2],hl1_ljtpt_eta[b][1],"cl=0.683 b(1,1) mode");
+
+        // full HLT efficiency
+        for(int t=0; t<nhlTrigs; t++){hr_HLT_ljtpt_eta[b][t] = new TGraphAsymmErrors(hhlt_ljtpt_eta[b][t],h_ljtpt_eta[b],"cl=0.683 b(1,1) mode");}
         
         // eta phi maps
         hr_ep_eta[b][0]->Divide(hl1hlt_ep_eta[b][0], hl1_ep_eta[b][0], 1, 1, "B");
@@ -158,6 +163,8 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
             hr_ep_hibin[b][0][hb]->Divide(hl1hlt_ep_hibin[b][0][hb], hl1_ep_hibin[b][0][hb], 1, 1, "B");
             hr_ep_hibin[b][1][hb]->Divide(hl1hlt_ep_hibin[b][1][hb], hl1_ep_hibin[b][0][hb], 1, 1, "B");
             hr_ep_hibin[b][2][hb]->Divide(hl1hlt_ep_hibin[b][2][hb], hl1_ep_hibin[b][1][hb], 1, 1, "B");
+            // full HLT efficiency
+            for(int t=0; t<nhlTrigs; t++){hr_HLT_ljtpt_hibin[b][t][hb] = new TGraphAsymmErrors(hhlt_ljtpt_hibin[b][t][hb],h_ljtpt_hibin[b][hb],"cl=0.683 b(1,1) mode");}
         }
     }
     cout<<"finished generating ratios"<<endl;
@@ -190,10 +197,12 @@ void JetTurnOn_Assemble_v0_11_9_2025(){
     for(unsigned int b=0; b<netabins; b++){
         TString sEtaBin = Form("_AbsEta_%.0f_to_%.0f",etalo[b]*10,etahi[b]*10);
         save_gr_alltrig(hr_ljtpt_eta, b, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn_inclusive"+sEtaBin, "");
-        for(int t=0; t<nhlTrigs; t++){save_h2f(hr_ep_eta, b, t, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+sEtaBin, sHLTrigs[t]);}
+        save_gr_alltrig(hr_HLT_ljtpt_eta, b, "p_{T,leading jet}", "hlt fire/ all events", "HLT_TurnOn_inclusive"+sEtaBin, "");
+        // for(int t=0; t<nhlTrigs; t++){save_h2f(hr_ep_eta, b, t, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+sEtaBin, sHLTrigs[t]);}
         for(unsigned int hb=0; hb<nhiBin; hb++){
-            save_gr_alltrig_hibin(hr_ljtpt_hibin, b, hb, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn"+htitles_byhibin[hb]+sEtaBin, "");
-            for(int t=0; t<nhlTrigs; t++){save_h2f_hibin(hr_ep_hibin, b, t, hb, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+htitles_byhibin[hb]+sEtaBin, sHLTrigs[t]+shiBins[hb]);}
+            save_gr_alltrig_hibin(hr_ljtpt_hibin, b, hb, "p_{T,leading jet}", "hlt & l1 fire/ l1 fire", "RelHLT_TurnOn"+shiBins[hb]+sEtaBin, "");
+            save_gr_alltrig_hibin(hr_HLT_ljtpt_hibin, b, hb, "p_{T,leading jet}", "hlt fire/ all events", "HLT_TurnOn"+shiBins[hb]+sEtaBin, "");
+            // for(int t=0; t<nhlTrigs; t++){save_h2f_hibin(hr_ep_hibin, b, t, hb, "#eta^{leading jet}", "#phi^{leading jet}", "eta_phi"+sHLTrigs_short[t]+htitles_byhibin[hb]+sEtaBin, sHLTrigs[t]+shiBins[hb]);}
         }
     }
     cout<<"ratios saved as png files"<<endl;
