@@ -1,5 +1,5 @@
 
-#include "JetCheck_PbPb_MC_binning.h"
+#include "Jet_PbPb_DATA_binning.h"
 
 /// file paths
 // non-overlay
@@ -180,7 +180,7 @@ void save_2dr_byhibin(TH2F *h[netabins][nhiBin], int etaindex, int hibinindex, T
     TH2F *h_c = (TH2F*)h[etaindex][hibinindex]->Clone(hname);
 
     // markers
-    h_c->GetZaxis()->SetRangeUser(0.0, 3.0);
+    h_c->GetZaxis()->SetRangeUser(0.9, 1.2);
     h_c->Draw("colz");
     // h_c->SetMarkerStyle(1);
     h_c->SetMarkerStyle(8);
@@ -256,7 +256,7 @@ void save_2dr_byeta(TH2F *h[netabins], int etaindex, TString xtitle, TString yti
     TH2F *h_c = (TH2F*)h[etaindex]->Clone(hname);
 
     // markers
-    h_c->GetZaxis()->SetRangeUser(0.0, 3.0);
+    h_c->GetZaxis()->SetRangeUser(0.9, 1.2);
     // h_c->SetMinimum(0.0);
     // h_c->SetMaximum(5.0);
     h_c->Draw("colz");
@@ -311,9 +311,9 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     // // setting y axis limits
     if(xtitle=="#eta^{jet}"){h1_c->SetMaximum(0.1);}
     if(xtitle=="#eta^{jet}"){h1_c->SetMinimum(0.0);}
-    if(xtitle=="#phi^{jet}"){h1_c->SetMaximum(0.025);}
+    if(xtitle=="#phi^{jet}"){h1_c->SetMaximum(0.05);}
     if(xtitle=="#phi^{jet}"){h1_c->SetMinimum(0.0);}
-    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(10,1000);}
+    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcut,1000);}
 
     // parent histogram (h[0])
     h1_c->Draw("e1p");
@@ -355,13 +355,24 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     h1_c->GetYaxis()->SetTitleOffset(2);
     h1_c->GetXaxis()->SetTitleOffset(1.3);
 
+    float x0 = 0.5;
+    float x1 = 0.9;
+    float y0 = 0.6;
+    float y1 = 0.9;
+    if(xtitle=="#eta^{jet}"){
+        x0 = 0.2;
+        x1 = 0.7;
+        y0 = 0.175;
+        y1 = 0.45;
+    }
     // legend
-    // TLegend *l = new TLegend(0.5,0.6,0.9,0.9);
-    TLegend *l = new TLegend(0.2,0.175,0.7,0.45);
+    TLegend *l = new TLegend(x0,y0,x1,y1);
+    // TLegend *l = new TLegend(0.2,0.175,0.7,0.45);
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > 20 GeV, "+htitles_byeta[etaindex], "");
+    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
         if(i==(nhiBin-1)){continue;}
@@ -411,11 +422,16 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     if(xtitle=="#phi^{jet}"){h1_c->SetMinimum(0.5);}
     if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->SetMaximum(5);}
     if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->SetMinimum(0);}
-    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(10,1000);}
+    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcut,1000);}
 
     // tline
     int binxmax = h1_c->FindLastBinAbove(h1_c->GetBinLowEdge(1));
-    TLine *line1 = new TLine(h1_c->GetBinLowEdge(1),1,(h1_c->GetBinLowEdge(binxmax)+h1_c->GetBinWidth(binxmax)),1);
+    float linexmax = h1_c->GetBinLowEdge(binxmax)+h1_c->GetBinWidth(binxmax);
+    float linexmin = h1_c->GetBinLowEdge(1);
+    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){linexmin=ptlims[0];linexmax=ptlims[1];}
+    if(xtitle=="#eta^{jet}"){linexmin=etalims[0];linexmax=etalims[1];}
+    if(xtitle=="#phi^{jet}"){linexmin=philims[0];linexmax=philims[1];}
+    TLine *line1 = new TLine(linexmin,1,linexmax,1);
     line1->SetLineWidth(1);
     line1->SetLineColor(kBlack);
     line1->SetLineStyle(2);
@@ -468,7 +484,8 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > 20 GeV, "+htitles_byeta[etaindex], "");
+    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
         if(i==(nhiBin-1)){continue;}
@@ -554,8 +571,6 @@ void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfin
     c->SetBottomMargin(0.15);
     h1_c->GetYaxis()->SetTitleOffset(1.8);
     h1_c->GetXaxis()->SetTitleOffset(1.3);
-    
-    TString htitles_byeta[3] = {"|#eta| < 1.6", "|#eta| < 2.4", "|#eta| < 5"};
 
     // legend
     float x0 = 0.5;
@@ -567,7 +582,8 @@ void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfin
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > 20 GeV, "+htitles_byeta[etaindex], "");
+    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
         if(i==(nhiBin-1)){continue;}
@@ -626,7 +642,8 @@ void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfinde
     h1_c->Draw("e1p");
     line1->Draw("same");
     if((xtitle=="NHF")||(xtitle=="NEF")||(xtitle=="CHF")){h1_c->GetYaxis()->SetRangeUser(0.8,1.2);}
-    if((xtitle=="MUF")||(xtitle=="CEF")){h1_c->GetYaxis()->SetRangeUser(0.0,2.0);}
+    // if((xtitle=="MUF")||(xtitle=="CEF")){h1_c->GetYaxis()->SetRangeUser(0.0,2.0);}
+    if(xtitle=="MUF"){h1_c->GetYaxis()->SetRangeUser(0.0,2.0);}
     h1_c->SetMarkerStyle(1);
     h1_c->SetMarkerColor(kBlack);
     h1_c->SetLineColor(kBlack);
@@ -664,8 +681,6 @@ void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfinde
     c->SetBottomMargin(0.15);
     h1_c->GetYaxis()->SetTitleOffset(1.8);
     h1_c->GetXaxis()->SetTitleOffset(1.3);
-    
-    TString htitles_byeta[3] = {"|#eta| < 1.6", "|#eta| < 2.4", "|#eta| < 5"};
 
     // legend
     float x0 = 0.5;
@@ -677,7 +692,8 @@ void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfinde
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > 20 GeV, "+htitles_byeta[etaindex], "");
+    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
         if(i==(nhiBin-1)){continue;}
