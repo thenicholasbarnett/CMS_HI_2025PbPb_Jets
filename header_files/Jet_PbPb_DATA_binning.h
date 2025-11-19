@@ -4,23 +4,15 @@
 const Float_t ptcut = 20.0;
 TString sptcut = "20";
 
-// const Float_t ptcut = 100.0;
-// TString sptcut = 100.0;
-
-// const Float_t ptcut = 40.0;
-// TString sptcut = "40";
-
 // strings of ttrees and branches of interest //
 
 // ttree names
 const Int_t nTTrees = 3;
 TString sTTrees[nTTrees] = {"hiEvtAnalyzer/HiTree", "skimanalysis/HltTree", "akCs4PFJetAnalyzer/t"};
-// const Int_t nTTrees = 4;
-// TString sTTrees[nTTrees] = {"hiEvtAnalyzer/HiTree", "skimanalysis/HltTree", "akCs4PFJetAnalyzer/t", "hltanalysis/HltTree"};
 
 // event
-const Int_t nEvtBranch = 3;
-TString sEvtBranch[nEvtBranch] = {"vz", "hiBin", "run"};
+const Int_t nEvtBranch = 5;
+TString sEvtBranch[nEvtBranch] = {"vz", "hiBin", "run", "evt", "lumi"};
 
 // filters
 const Int_t nFilters = 2;
@@ -51,16 +43,16 @@ const int nvzbins = 40;
 const float vzlims[2] = {-20.0, 20.0}; 
 
 // pT
-const int nptbins = 100;
+const int nptbins = 200;
 const float ptlims[2] = {0.0, 1000.0}; 
 
 // pT ratio
-const int nptrbins = 100;
+const int nptrbins = 200;
 const float ptrlims[2] = {0.0, 1.0}; 
 
 //eta
 const int nhetabins = 50;
-const float etalims[2] = {-5.1, 5.1};
+const float etalims[2] = {-5.0, 5.0};
 
 //phi
 const int nphibins = 64;
@@ -86,6 +78,10 @@ const int pfmlims[2] = {0, 50};
 const int nhibins = 200;
 const int hibinlims[2] = {0, 200};
 
+// run
+const int nrunbins = 200;
+const int hrunlims[2] = {399300, 399500};
+
 // centrality binning
 const int nhiBin = 5;
 const int nhiBin1 = 6;
@@ -98,9 +94,9 @@ TString htitles_byhibin[nhiBin] = {"_hiBin_0_to_20", "_hiBin_20_to_60", "_hiBin_
 // |eta|
 const int netabins = 3;
 const float etalo[netabins] = {0.0, 0.0, 0.0};
-const float etahi[netabins] = {1.6, 2.4, 5.0};
-TString sEtaBins[netabins] = {"|#eta| < 1.6", "|#eta| < 2.4", "|#eta| < 5"};
-TString htitles_byeta[netabins] = {"_AbsEta_0_to_1p6", "_AbsEta_0_to_2p4", "_AbsEta_0_to_5"};
+const float etahi[netabins] = {2.0, 2.4, 5.0};
+TString sEtaBins[netabins] = {"|#eta| < 2", "|#eta| < 2.4", "|#eta| < 5"};
+TString htitles_byeta[netabins] = {"_AbsEta_0_to_2", "_AbsEta_0_to_2p4", "_AbsEta_0_to_5"};
 
 // momenta
 const int nmombins[nmom] = {nptbins, nptbins, nhetabins, nphibins};
