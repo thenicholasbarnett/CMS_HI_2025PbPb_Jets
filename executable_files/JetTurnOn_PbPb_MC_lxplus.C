@@ -9,7 +9,7 @@
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/Jet_PbPb_MC_binning.h"
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025_PbPb_MC_Triggers.h"
 
-void JetTurnOn_PbPb_MC_lxplus_v0_11_10_2025(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2025PbPb_DijetMC_fdamas_cmssw15_1_0.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_10_2025/JetTurnOn_2025PbPbMC_11_10_2025_noDM.root"){
+void JetTurnOn_PbPb_MC_lxplus(TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_2025PbPb_DijetMC_fdamas_cmssw15_1_0.txt",TString output="/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_10_2025/JetTurnOn_2025PbPbMC_11_10_2025_noDM.root"){
 
     // declaring variables //
 
