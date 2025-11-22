@@ -1,8 +1,32 @@
+// dimensionality of plots //
 
-// maximum pt of jets to include
+// centrality binning
+const int nhiBin = 5;
+const int nhiBin1 = 6;
+int hiBins[nhiBin1] = {0, 20, 60, 100, 160, 200};
+int hiBinlo[nhiBin] = {0, 20, 60, 100, 160};
+int hiBinhi[nhiBin] = {20, 60, 100, 160, 200};
+TString shiBins[nhiBin] = {"0 < hiBin < 20", "20 < hiBin < 60", "60 < hiBin < 100", "100 < hiBin < 160", "160 < hiBin < 200"};
+TString htitles_byhibin[nhiBin] = {"_hiBin_0_to_20", "_hiBin_20_to_60", "_hiBin_60_to_100", "_hiBin_100_to_160", "_hiBin_160_to_200"};
 
-const Float_t ptcut = 20.0;
+// |eta|
+const int netabins = 3;
+const float etalo[netabins] = {0.0, 0.0, 0.0};
+const float etahi[netabins] = {2.0, 2.4, 5.0};
+TString sEtaBins[netabins] = {"|#eta| < 2", "|#eta| < 2.4", "|#eta| < 5"};
+TString htitles_byeta[netabins] = {"_AbsEta_0_to_2", "_AbsEta_0_to_2p4", "_AbsEta_0_to_5"};
+
+// maximum pts of jets to include
+const Int_t nptcuts = 4;
+const Float_t ptcuts[nptcuts] = {0.0, 20.0, 50.0, 100.0};
+TString sptcuts[nptcuts] = {"p_{T} < 0", "p_{T} < 20", "p_{T} < 50", "p_{T} < 100"};
+TString htitles_byptcut[nptcuts] = {"_ptcut_0", "_ptcut_20", "_ptcut_50", "_ptcut_100"};
+
+float ptcut = 20.0;
 TString sptcut = "20";
+
+// strings for titles
+TString ep = "etaphi";
 
 // strings of ttrees and branches of interest //
 
@@ -15,8 +39,8 @@ const Int_t nEvtBranch = 5;
 TString sEvtBranch[nEvtBranch] = {"vz", "hiBin", "run", "evt", "lumi"};
 
 // filters
-const Int_t nFilters = 2;
-TString sFilters[nFilters] = {"pclusterCompatibilityFilter", "pprimaryVertexFilter"};
+const Int_t nFilters = 3;
+TString sFilters[nFilters] = {"pclusterCompatibilityFilter", "pprimaryVertexFilter", "pphfCoincFilterPF2Th4"};
 
 // jet branches
 const Int_t nJetBranch = 15;
@@ -56,7 +80,7 @@ const float etalims[2] = {-5.0, 5.0};
 
 //phi
 const int nphibins = 64;
-const float philims[2] = {-3.2, 3.2};
+const float philims[2] = {-1*TMath::Pi(),TMath::Pi()};
 
 // nref
 const int nrefbins = 30;
@@ -79,24 +103,8 @@ const int nhibins = 200;
 const int hibinlims[2] = {0, 200};
 
 // run
-const int nrunbins = 200;
-const int hrunlims[2] = {399300, 399500};
-
-// centrality binning
-const int nhiBin = 5;
-const int nhiBin1 = 6;
-int hiBins[nhiBin1] = {0, 20, 60, 100, 160, 200};
-int hiBinlo[nhiBin] = {0, 20, 60, 100, 160};
-int hiBinhi[nhiBin] = {20, 60, 100, 160, 200};
-TString shiBins[nhiBin] = {"0 < hiBin < 20", "20 < hiBin < 60", "60 < hiBin < 100", "100 < hiBin < 160", "160 < hiBin < 200"};
-TString htitles_byhibin[nhiBin] = {"_hiBin_0_to_20", "_hiBin_20_to_60", "_hiBin_60_to_100", "_hiBin_100_to_160", "_hiBin_160_to_200"};
-
-// |eta|
-const int netabins = 3;
-const float etalo[netabins] = {0.0, 0.0, 0.0};
-const float etahi[netabins] = {2.0, 2.4, 5.0};
-TString sEtaBins[netabins] = {"|#eta| < 2", "|#eta| < 2.4", "|#eta| < 5"};
-TString htitles_byeta[netabins] = {"_AbsEta_0_to_2", "_AbsEta_0_to_2p4", "_AbsEta_0_to_5"};
+const int nrunbins = 1000;
+const int hrunlims[2] = {399000, 400000};
 
 // momenta
 const int nmombins[nmom] = {nptbins, nptbins, nhetabins, nphibins};
