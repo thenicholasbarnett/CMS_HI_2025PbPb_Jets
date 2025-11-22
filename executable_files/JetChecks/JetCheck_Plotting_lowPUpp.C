@@ -9,7 +9,7 @@
 #include "../header_files/JetCheck_lowPUpp_plotting.h"
 // #include "../header_files/JetCheck_lowPUpp_binning.h"
 
-void JetRecoCheck_Plotting_lowPUpp(){
+void JetCheck_Plotting_lowPUpp(){
 
     // getting rid of legends in hists in root file
     gStyle->SetOptStat(0);
