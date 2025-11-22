@@ -6,8 +6,9 @@ const Int_t nhlTrigs = 5;
 TString sHLTrigs[nhlTrigs] = {"HLT_HIPuAK4CaloJet40Eta5p1_MinBiasHF1AND_v8", "HLT_HIPuAK4CaloJet60Eta5p1_MinBiasHF1AND_v8", "HLT_HIPuAK4CaloJet80Eta5p1_v16", "HLT_HIPuAK4CaloJet100Eta5p1_v16", "HLT_HIPuAK4CaloJet120Eta5p1_v16"};
 TString sHLTrigs_short[nhlTrigs] = {"_HLT_Jet40", "_HLT_Jet60", "_HLT_Jet80", "_HLT_Jet100", "_HLT_Jet120"};
 float HLT_Thresh[nhlTrigs] = {40.0, 60.0, 80.0, 100.0, 120.0};
+const int L1SeedHLT[nhlTrigs] = {0,0,1,1,2};
 
-// level 1 triggers
+// level 1 trigger seeds for HLT
 const int nl1Trigs = 3;
 TString sL1Trigs[nl1Trigs]= {"L1_MinimumBiasHF1_AND_BptxAND","L1_SingleJet60_BptxAND","L1_SingleJet80_BptxAND"};
 TString sL1Trigs_short[nl1Trigs] = {"_L1_MinBias", "_L1_Jet60", "_L1_Jet80"};
