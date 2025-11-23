@@ -7,7 +7,7 @@
 #include "TDirectory.h"
 
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/Jet_PbPb_MC_binning.h"
-#include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025_PbPb_MC_Triggers.h"
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025PbPb_JetTriggers.h"
 
 void JetTurnOn_PbPb_MC_lxplus(TString input_file_list, TString output){
 
