@@ -34,12 +34,15 @@ public:
 
     bool JetSelection(Float_t jteta, Float_t jtphi, Float_t CEF, Float_t NEF, Float_t MUF){
         bool KeepJet=false;
-        if(TMath::Abs(jteta)<=2.6){if((NEF<0.9)||(MUF<0.8)||(CEF<0.8)){KeepJet=true;}}
-        if((TMath::Abs(jteta)>2.6)&&(TMath::Abs(jteta)<=2.7)){if((NEF<0.99)||(MUF<0.8)||(CEF<0.8)){KeepJet=true;}}
-        if((TMath::Abs(jteta)>2.7)&&(TMath::Abs(jteta)<=3.0)){if((NEF<0.99)){KeepJet=true;}}
-        if((TMath::Abs(jteta)>3)&&(TMath::Abs(jteta)<=5.0)){if((NEF<0.9)){KeepJet=true;}}
+        bool KeepJet_map=false;
+        bool KeepJet_id=false;
+        if(TMath::Abs(jteta)<=2.6){if((NEF<0.9)&&(MUF<0.8)&&(CEF<0.8)){KeepJet_id=true;}}
+        if((TMath::Abs(jteta)>2.6)&&(TMath::Abs(jteta)<=2.7)){if((NEF<0.99)&&(MUF<0.8)&&(CEF<0.8)){KeepJet_id=true;}}
+        if((TMath::Abs(jteta)>2.7)&&(TMath::Abs(jteta)<=3.0)){if((NEF<0.99)){KeepJet_id=true;}}
+        if((TMath::Abs(jteta)>3)&&(TMath::Abs(jteta)<=5.0)){if((NEF<0.9)){KeepJet_id=true;}}
         Double_t vetomapval = hvetomap_->GetBinContent(hvetomap_->FindBin(jteta, jtphi));
-        if(vetomapval==0){KeepJet=true;}
+        if(vetomapval==0){KeepJet_map=true;}
+        if((KeepJet_id==true)&&(KeepJet_map==true)){KeepJet=true;}
         return KeepJet;
     }
 };
@@ -53,6 +56,9 @@ public:
 // JetSelect js("/path/to/file/JetVetoMap.root");
 // OR
 // JetSelect js;
+// jet veto maps are regularly uploaded to this GitHub repository: https://github.com/cms-jet/JECDatabase/tree/master/jet_veto_maps
+// latest veto map as of November 25th, 2025 can be quickly grabbed with wget https://github.com/cms-jet/JECDatabase/raw/refs/heads/master/jet_veto_maps/Winter25Prompt25/Winter25Prompt25_RunCDE.root 
+
 
 // if(!js.JetSelection(jteta[0], jtphi[0], jtPfCEF[0], jtPfNEF[0],jtPfMUF[0])){continue;}
 // Do your stuff
