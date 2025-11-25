@@ -104,7 +104,7 @@ const int hibinlims[2] = {0, 200};
 
 // run
 const int nrunbins = 1000;
-const int hrunlims[2] = {399000, 400000};
+const int hrunlims[2] = {399300, 400300};
 
 // momenta
 const int nmombins[nmom] = {nptbins, nptbins, nhetabins, nphibins};
