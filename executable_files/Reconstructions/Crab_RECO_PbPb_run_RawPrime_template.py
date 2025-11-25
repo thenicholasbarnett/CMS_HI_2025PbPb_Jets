@@ -14,7 +14,7 @@ config.JobType.psetName = 'recoPbPbrawPr2mini_RAW2DIGI_L1Reco_RECO_PAT_T4.py'
 config.JobType.allowUndistributedCMSSW = True
 config.JobType.numCores = 4
 config.JobType.maxMemoryMB = 10000
-config.JobType.maxJobRuntimeMin = 480
+#config.JobType.maxJobRuntimeMin = 480
 
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
