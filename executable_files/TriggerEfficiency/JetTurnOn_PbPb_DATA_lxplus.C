@@ -8,16 +8,17 @@
 #include <vector>
 #include <iostream>
 
-// #include "/afs/cern.ch/user/n/nbarnett/public/header_files/JetSelection_PbPb.h"
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/JetSelection_PbPb.h"
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/JSON_handler.h"
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/Jet_PbPb_DATA_binning.h"
-#include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025PbPb_JetTriggers.h"
+// #include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025PbPb_JetTriggers.h"
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/2025PbPb_JetTriggers_Prod.h"
 
 void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TString output_txt){
 
     // for applying JSON and Jet Selections from headers
     JSON_handler dcs;
-    // JetSelect js;
+    JetSelect js;
 
     // declaring variables //
 
@@ -87,8 +88,7 @@ void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TSt
     TH1F *hl1hlt_ljtpt_hibin[2][netabins][nhlTrigs][nhiBin];
 
     // initializing histograms //
-
-    TString hname = "hjtpt";
+    TString hname;
     
     // by eta
     for(unsigned int b=0; b<netabins; b++){
@@ -143,16 +143,6 @@ void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TSt
             }
         }
     }
-
-    // getting jet veto map //
-
-    // opening root file with map
-    TString sfVetoMap = "/eos/cms/store/group/phys_heavyions/nbarnett/Winter25Prompt25_RunCDE.root";
-    TFile *fvm = TFile::Open(sfVetoMap,"read");
-   
-    // getting map as 2d histogram
-    TString shVetoMap = "jetvetomap_all";
-    TH2D *hvetomap = (TH2D*)fvm->Get(shVetoMap);
 
     // getting list of root files to process
     ifstream myfile(input_filelist);
@@ -290,15 +280,8 @@ void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TSt
             // only looking at events that fire the minbias l1 trigger
             if(jet_L1[0]==0){continue;}
 
-            // jet pt cut applied to leading jet
-            if(jtpt[0]<ptcut){continue;}
-
-            // checking jet veto map 
-            Double_t vetomapval = hvetomap->GetBinContent(hvetomap->FindBin(jteta[0], jtphi[0]));
-            if(vetomapval!=0){continue;}
-
-            //// AGREED UPON JET ID REQUIREMENTS ////
-            if((jtPfCHF[0]>=0.99)||(jtPfCEF[0]>=0.8)||(jtPfMUF[0]>=0.8)){continue;}
+            // using header file for jet identification
+            if(!js.JetSelection(jteta[0], jtphi[0], jtPfCEF[0], jtPfNEF[0],jtPfMUF[0])){continue;}
 
             // matching HLT object to offline jet
             int iHltMatch[nhlTrigs] = {0};
@@ -311,7 +294,6 @@ void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TSt
                     if(HLT_JetObj_pt[t]->at(tj)<HLT_Thresh[t]){iHltMatch[t]=0;}
                 }
             }
-            // for(int t=0; t<nhlTrigs; t++){if((iHltMatch[t]==0)&&(jet_HLT[t]==1)){cout<<"no dR match but "<<sHLTrigs[t]<<" fires"<<endl;}}
 
             // filling last event histogram
             hnref->Fill(nref);
@@ -323,18 +305,20 @@ void JetTurnOn_PbPb_DATA_lxplus(TString input_filelist, TString output_root, TSt
 
                 int flag_l1 = 0;
                 int flag_lthlt = 0;
-                
+                int drop_flag = 0;
+
                 for(int t=0; t<nhlTrigs; t++){
 
                     // writing out to text file when we have drops
-                    if((iHltMatch[t]!=0)&&(jet_HLT[t]==0)&&(jtpt[0]>(HLT_Thresh[t]+40.0))){
-                        cout<<"entry "<<i<<endl;
-                        cout<<"leading jet pt is "<<jtpt[lj]<<endl;
-                        cout<<", but "+sHLTrigs[t]+" didn't fire :("<<endl;
-                        outputFile<<"\n"<< filename<<"\n";
-                        outputFile<<"run is "<<run<<", lumi is "<<lumi<<", event is "<<event<<", entry is "<<i<<"\n";
-                        outputFile<<"hiBin is "<<hiBin<<", leading jet pt is "<<jtpt[0]<<"\n";
-                        outputFile<<"CHF:NHF:CEF:NEF:MUF are "<<jtPfCHF[0]<<":"<<jtPfNHF[0]<<":"<<jtPfCEF[0]<<":"<<jtPfNEF[0]<<":"<<jtPfMUF[0]<<"\n";
+                    if((b==(netabins-1))&&(jet_HLT[t]==0)&&(jtpt[0]>(HLT_Thresh[t]+40.0))){
+                        if(t<2){continue;}
+                        if(drop_flag==0){
+                            outputFile<<"\n"<< filename<<"\n";
+                            outputFile<<"run is "<<run<<", lumi is "<<lumi<<", event is "<<event<<", entry is "<<i<<"\n";
+                            outputFile<<"hiBin is "<<hiBin<<", leading jet pt is "<<jtpt[0]<<"\n";
+                            outputFile<<"CHF:NHF:CEF:NEF:MUF of leading offline jet are "<<jtPfCHF[0]<<":"<<jtPfNHF[0]<<":"<<jtPfCEF[0]<<":"<<jtPfNEF[0]<<":"<<jtPfMUF[0]<<"\n";
+                            drop_flag=1;
+                        }
                         outputFile<<sHLTrigs[t]+" didn't fire\n";
                     }
 
