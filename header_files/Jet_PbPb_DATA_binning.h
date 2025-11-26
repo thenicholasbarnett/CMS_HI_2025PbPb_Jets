@@ -11,10 +11,10 @@ TString htitles_byhibin[nhiBin] = {"_hiBin_0_to_20", "_hiBin_20_to_60", "_hiBin_
 
 // |eta|
 const int netabins = 3;
-const float etalo[netabins] = {0.0, 0.0, 0.0};
-const float etahi[netabins] = {2.0, 2.4, 5.0};
-TString sEtaBins[netabins] = {"|#eta| < 2", "|#eta| < 2.4", "|#eta| < 5"};
-TString htitles_byeta[netabins] = {"_AbsEta_0_to_2", "_AbsEta_0_to_2p4", "_AbsEta_0_to_5"};
+const float etalo[netabins] = {0.0, 2.0, 0.0};
+const float etahi[netabins] = {2.0, 5.0, 5.0};
+TString sEtaBins[netabins] = {"|#eta| < 2", "2 < |#eta| < 5", "|#eta| < 5"};
+TString htitles_byeta[netabins] = {"_AbsEta_0_to_2p0", "_AbsEta_2p0_to_5p0", "_AbsEta_0_to_5p0"};
 
 // maximum pts of jets to include
 const Int_t nptcuts = 4;
@@ -22,11 +22,8 @@ const Float_t ptcuts[nptcuts] = {0.0, 20.0, 50.0, 100.0};
 TString sptcuts[nptcuts] = {"p_{T} < 0", "p_{T} < 20", "p_{T} < 50", "p_{T} < 100"};
 TString htitles_byptcut[nptcuts] = {"_ptcut_0", "_ptcut_20", "_ptcut_50", "_ptcut_100"};
 
-float ptcut = 20.0;
-TString sptcut = "20";
-
 // strings for titles
-TString ep = "etaphi";
+TString ep = "hjtetaphi";
 
 // strings of ttrees and branches of interest //
 
