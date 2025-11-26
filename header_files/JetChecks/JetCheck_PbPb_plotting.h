@@ -6,24 +6,25 @@
 TString path_mom = "plots/individual/momenta/";
 TString path_ep = "plots/individual/eta_phi/";
 TString path_frac = "plots/individual/fractions/";
-TString path_mult = "plots/individual/multiplicity/";
 // overlay
 TString path_ovr_mom = "plots/overlays/momenta/";
 TString path_ovr_frac = "plots/overlays/fractions/";
-TString path_ovr_mult = "plots/overlays/multiplicity/";
 // ratios
 TString pathr_mom = "plots/ratio/individual/momenta/";
 TString pathr_ep = "plots/ratio/individual/eta_phi/";
 TString pathr_frac = "plots/ratio/individual/fractions/";
-TString pathr_mult = "plots/ratio/individual/multiplicity/";
 TString pathr_ovr_mom = "plots/ratio/overlays/momenta/";
 TString pathr_ovr_frac = "plots/ratio/overlays/fractions/";
-TString pathr_ovr_mult = "plots/ratio/overlays/multiplicity/";
+    
+// declaring strings //
 
-void normalizeh(TH1F *h){
-    double a = h->Integral();
-    h->Scale(1.0/a);
-}
+// histogram names
+TString htitles_mom_name[nmom] = {"raw_jet_pt", "jet_pt", "jet_eta", "jet_phi"};
+TString htitles_frac_name[nfrac] = {"Charged_Hadron_Fraction", "Neutral_Hadron_Fraction", "Charged_Electromagnetic_Fraction", "Neutral_Electromagnetic_Fraction", "Muon_Fraction"};
+
+// x axis titles
+TString htitles_mom_xaxis[nmom] = {"p_{T}^{raw}", "p_{T}^{jet}", "#eta^{jet}", "#phi^{jet}"};
+TString htitles_frac_xaxis[nfrac] = {"CHF", "NHF", "CEF", "NEF", "MUF"};
 
 void save_h1f_1(TH1F *h, TString xtitle, TString ytitle, TString hname, TString path){
 
@@ -128,7 +129,7 @@ void save_h1i_1(TH1I *h, TString xtitle, TString ytitle, TString hname, TString 
     delete l;
 }
 
-void save_2d_byhibin(TH2F *h[2][netabins][nhiBin], int etaindex, int hibinindex, TString xtitle, TString ytitle, TString htitle, TString hname, TString path){
+void save_2df(TH2F* h, TString xtitle, TString ytitle, TString htitle, TString hname, TString path){
 
     // canvas
     TCanvas *c = new TCanvas();
@@ -139,7 +140,7 @@ void save_2d_byhibin(TH2F *h[2][netabins][nhiBin], int etaindex, int hibinindex,
     c->SetRealAspectRatio();
 
     // clone of hist
-    TH2F *h_c = (TH2F*)h[0][etaindex][hibinindex]->Clone(hname);
+    TH2F *h_c = (TH2F*)h->Clone(hname);
 
     // markers
     h_c->GetZaxis()->SetRangeUser(0.0, 0.001);
@@ -166,131 +167,7 @@ void save_2d_byhibin(TH2F *h[2][netabins][nhiBin], int etaindex, int hibinindex,
     // delete l;
 }
 
-void save_2dr_byhibin(TH2F *h[netabins][nhiBin], int etaindex, int hibinindex, TString xtitle, TString ytitle, TString htitle, TString hname, TString path){
-
-    // canvas
-    TCanvas *c = new TCanvas();
-    c->SetTitle("");
-    c->SetName(hname);
-    c->cd();
-    // c->SetLogy();
-    c->SetRealAspectRatio();
-
-    // clone of hist
-    TH2F *h_c = (TH2F*)h[etaindex][hibinindex]->Clone(hname);
-
-    // markers
-    h_c->GetZaxis()->SetRangeUser(0.9, 1.2);
-    h_c->Draw("colz");
-    // h_c->SetMarkerStyle(1);
-    h_c->SetMarkerStyle(8);
-    h_c->SetMarkerColor(kBlack);
-    h_c->SetLineColor(kBlack);
-
-    // titles
-    h_c->SetTitle(htitle);
-    h_c->SetName(hname);
-    h_c->GetYaxis()->SetTitle(ytitle);
-    h_c->GetYaxis()->CenterTitle(true);
-    h_c->GetXaxis()->SetTitle(xtitle);
-    h_c->GetXaxis()->CenterTitle(true);
-
-    // saving
-    c->SaveAs(path+hname+".png");
-
-    // deleting
-    delete c;
-    delete h_c;
-    // delete l;
-}
-
-void save_2d_byeta(TH2F *h[2][netabins], int etaindex, TString xtitle, TString ytitle, TString htitle, TString hname, TString path){
-
-    // canvas
-    TCanvas *c = new TCanvas();
-    c->SetTitle("");
-    c->SetName(hname);
-    c->cd();
-    // c->SetLogy();
-    c->SetRealAspectRatio();
-
-    // clone of hist
-    TH2F *h_c = (TH2F*)h[0][etaindex]->Clone(hname);
-
-    // markers
-    h_c->GetZaxis()->SetRangeUser(0.0, 0.001);
-    h_c->Draw("colz");
-    // h_c->SetMarkerStyle(1);
-    h_c->SetMarkerStyle(8);
-    h_c->SetMarkerColor(kBlack);
-    h_c->SetLineColor(kBlack);
-
-    // titles
-    h_c->SetTitle(htitle);
-    h_c->SetName(hname);
-    h_c->GetYaxis()->SetTitle(ytitle);
-    h_c->GetYaxis()->CenterTitle(true);
-    h_c->GetXaxis()->SetTitle(xtitle);
-    h_c->GetXaxis()->CenterTitle(true);
-
-    // saving
-    c->SaveAs(path+hname+".png");
-
-    // deleting
-    delete c;
-    delete h_c;
-    // delete l;
-}
-
-void save_2dr_byeta(TH2F *h[netabins], int etaindex, TString xtitle, TString ytitle, TString htitle, TString hname, TString path){
-
-    // canvas
-    TCanvas *c = new TCanvas();
-    c->SetTitle("");
-    c->SetName(hname);
-    c->cd();
-    // c->SetLogy();
-    c->SetRealAspectRatio();
-
-    // clone of hist
-    TH2F *h_c = (TH2F*)h[etaindex]->Clone(hname);
-
-    // markers
-    h_c->GetZaxis()->SetRangeUser(0.9, 1.2);
-    // h_c->SetMinimum(0.0);
-    // h_c->SetMaximum(5.0);
-    h_c->Draw("colz");
-    // h_c->SetMarkerStyle(1);
-    h_c->SetMarkerStyle(8);
-    h_c->SetMarkerColor(kBlack);
-    h_c->SetLineColor(kBlack);
-
-    // titles
-    h_c->SetTitle(htitle);
-    h_c->SetName(hname);
-    h_c->GetYaxis()->SetTitle(ytitle);
-    h_c->GetYaxis()->CenterTitle(true);
-    h_c->GetXaxis()->SetTitle(xtitle);
-    h_c->GetXaxis()->CenterTitle(true);
-
-    // saving
-    c->SaveAs(path+hname+".png");
-
-    // deleting
-    delete c;
-    delete h_c;
-    // delete l;
-}
-
-void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momindex, TString xtitle, TString ytitle, TString hname, TString path){
-
-    if(momindex < 0 || momindex >= nmom || etaindex < 0 || etaindex >= netabins){cerr << "ERROR: out-of-bounds indices in " << hname << endl;return;}
-    for(int i=0; i<nhiBin;i++){
-        if(!h[0][momindex][etaindex][i]){
-            cerr<<"ERROR: null histogram for hibin "<<shiBins[i]<<" in '"<< hname<<"'"<<endl;
-            return;
-        }
-    }
+void save_mom_overlay(TH1F *h[2][nmom][nptcuts][netabins][nhiBin], int ptindex, int etaindex, int momindex, TString xtitle, TString ytitle, TString hname, TString path){
 
     // canvas
     TCanvas *c = new TCanvas();
@@ -302,10 +179,10 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     c->SetRealAspectRatio();
 
     // clones of hists
-    TH1F *h1_c = (TH1F*)h[0][momindex][etaindex][0]->Clone();
+    TH1F *h1_c = (TH1F*)h[0][momindex][ptindex][etaindex][0]->Clone();
     TH1F *h_c[nhiBin-1];
     for(unsigned int i=1; i<nhiBin; i++){
-        h_c[i-1] = (TH1F*)h[0][momindex][etaindex][i]->Clone();
+        h_c[i-1] = (TH1F*)h[0][momindex][ptindex][etaindex][i]->Clone();
     }
 
     // // setting y axis limits
@@ -313,7 +190,7 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     if(xtitle=="#eta^{jet}"){h1_c->SetMinimum(0.0);}
     if(xtitle=="#phi^{jet}"){h1_c->SetMaximum(0.05);}
     if(xtitle=="#phi^{jet}"){h1_c->SetMinimum(0.0);}
-    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcut,1000);}
+    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcuts[ptindex],1000);}
 
     // parent histogram (h[0])
     h1_c->Draw("e1p");
@@ -371,7 +248,7 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sptcuts[ptindex], "");
     l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
@@ -390,15 +267,7 @@ void save_mom_overlay(TH1F *h[2][nmom][netabins][nhiBin], int etaindex, int momi
     delete l;
 }
 
-void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momindex, TString xtitle, TString ytitle, TString hname, TString path){
-
-    if(momindex < 0 || momindex >= nmom || etaindex < 0 || etaindex >= netabins){cerr << "ERROR: out-of-bounds indices in " << hname << endl;return;}
-    for(int i=0; i<nhiBin;i++){
-        if(!h[momindex][etaindex][i]){
-            cerr<<"ERROR: null histogram for hibin "<<shiBins[i]<<" in '"<< hname<<"'"<<endl;
-            return;
-        }
-    }
+void save_momr_overlay(TH1F *h[nmom][nptcuts][netabins][nhiBin], int ptindex, int etaindex, int momindex, TString xtitle, TString ytitle, TString hname, TString path){
 
     // canvas
     TCanvas *c = new TCanvas();
@@ -409,10 +278,10 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     c->SetRealAspectRatio();
 
     // clones of hists
-    TH1F *h1_c = (TH1F*)h[momindex][etaindex][0]->Clone();
+    TH1F *h1_c = (TH1F*)h[momindex][ptindex][etaindex][0]->Clone();
     TH1F *h_c[nhiBin-1];
     for(unsigned int i=1; i<nhiBin; i++){
-        h_c[i-1] = (TH1F*)h[momindex][etaindex][i]->Clone();
+        h_c[i-1] = (TH1F*)h[momindex][ptindex][etaindex][i]->Clone();
     }
 
     // // setting y axis limits
@@ -422,7 +291,7 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     if(xtitle=="#phi^{jet}"){h1_c->SetMinimum(0.5);}
     if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->SetMaximum(5);}
     if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->SetMinimum(0);}
-    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcut,1000);}
+    if((xtitle=="p_{T}^{raw}")||(xtitle=="p_{T}^{jet}")){h1_c->GetXaxis()->SetRangeUser(ptcuts[ptindex],1000);}
 
     // tline
     int binxmax = h1_c->FindLastBinAbove(h1_c->GetBinLowEdge(1));
@@ -484,7 +353,7 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sptcuts[ptindex], "");
     l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
@@ -504,15 +373,7 @@ void save_momr_overlay(TH1F *h[nmom][netabins][nhiBin], int etaindex, int momind
     delete line1;
 }
 
-void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfindex, TString xtitle, TString ytitle, TString hname, TString path){
-
-    if(pfindex < 0 || pfindex >= nmult || etaindex < 0 || etaindex >= netabins){cerr << "ERROR: out-of-bounds indices in " << hname << endl;return;}
-    for(int i=0; i<nhiBin;i++){
-        if(!h[0][pfindex][etaindex][i]){
-            cerr<<"ERROR: null histogram for trigger"<<shiBins[i]<<" in '"<< hname<<"'"<<endl;
-            return;
-        }
-    }
+void save_pf_overlay(TH1F *h[2][nfrac][nptcuts][netabins][nhiBin], int ptindex, int etaindex, int pfindex, TString xtitle, TString ytitle, TString hname, TString path){
 
     // canvas
     TCanvas *c = new TCanvas();
@@ -522,10 +383,10 @@ void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfin
     c->SetRealAspectRatio();
 
     // clones of hists
-    TH1F *h1_c = (TH1F*)h[0][pfindex][etaindex][0]->Clone();
+    TH1F *h1_c = (TH1F*)h[0][pfindex][ptindex][etaindex][0]->Clone();
     TH1F *h_c[nhiBin-1];
     for(unsigned int i=1; i<nhiBin; i++){
-        h_c[i-1] = (TH1F*)h[0][pfindex][etaindex][i]->Clone();
+        h_c[i-1] = (TH1F*)h[0][pfindex][ptindex][etaindex][i]->Clone();
     }
 
     // // setting y axis limits
@@ -582,7 +443,7 @@ void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfin
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sptcuts[ptindex], "");
     l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
@@ -601,15 +462,7 @@ void save_pf_overlay(TH1F *h[2][nmult][netabins][nhiBin], int etaindex, int pfin
     delete l;
 }
 
-void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfindex, TString xtitle, TString ytitle, TString hname, TString path){
-
-    if(pfindex < 0 || pfindex >= nmult || etaindex < 0 || etaindex >= netabins){cerr << "ERROR: out-of-bounds indices in " << hname << endl;return;}
-    for(int i=0; i<nhiBin;i++){
-        if(!h[pfindex][etaindex][i]){
-            cerr<<"ERROR: null histogram for trigger"<<shiBins[i]<<" in '"<< hname<<"'"<<endl;
-            return;
-        }
-    }
+void save_pfr_overlay(TH1F *h[nfrac][nptcuts][netabins][nhiBin], int ptindex, int etaindex, int pfindex, TString xtitle, TString ytitle, TString hname, TString path){
 
     // canvas
     TCanvas *c = new TCanvas();
@@ -619,10 +472,10 @@ void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfinde
     c->SetRealAspectRatio();
 
     // clones of hists
-    TH1F *h1_c = (TH1F*)h[pfindex][etaindex][0]->Clone();
+    TH1F *h1_c = (TH1F*)h[pfindex][ptindex][etaindex][0]->Clone();
     TH1F *h_c[nhiBin-1];
     for(unsigned int i=1; i<nhiBin; i++){
-        h_c[i-1] = (TH1F*)h[pfindex][etaindex][i]->Clone();
+        h_c[i-1] = (TH1F*)h[pfindex][ptindex][etaindex][i]->Clone();
     }
 
     // // setting y axis limits
@@ -692,7 +545,7 @@ void save_pfr_overlay(TH1F *h[nmult][netabins][nhiBin], int etaindex, int pfinde
     l->SetBorderSize(0);
     l->SetFillStyle(0);
     l->AddEntry((TObject*)0, "akCs4PF", "");
-    l->AddEntry((TObject*)0, "p_{T}^{jet} > "+sptcut+" GeV", "");
+    l->AddEntry((TObject*)0, sptcuts[ptindex], "");
     l->AddEntry((TObject*)0, sEtaBins[etaindex], "");
     l->AddEntry(h1_c,shiBins[0],"pl");
     for(unsigned int i=1; i<nhiBin; i++){
