@@ -8,7 +8,7 @@
 
 #include "header_files/JetCheck_PbPb_plotting.h"
 
-void JetCheck_PlottingRatio_PbPb(TString input_num, TString input_denom, int run_num){
+void JetCheck_PlottingRatio_PbPb(TString input_num, TString input_denom){
 
     // getting rid of legends in hists in root file
     gStyle->SetOptStat(0);
