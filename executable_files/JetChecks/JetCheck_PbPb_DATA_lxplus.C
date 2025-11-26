@@ -6,13 +6,16 @@
 #include "TH2.h"
 #include "TDirectory.h"
 
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/JetSelection_PbPb.h"
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/JSON_handler.h"
+#include "/afs/cern.ch/user/n/nbarnett/public/header_files/JSON_handler.h"
 #include "/afs/cern.ch/user/n/nbarnett/public/header_files/Jet_PbPb_DATA_binning.h"
 
-void JetCheck_PbPb_DATA_lxplus(){
-    
-    /// INPUTS ///
-    TString input_file_list="/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_RawPrime_Replay.txt"; 
-    TString output="/eos/cms/store/group/phys_heavyions/nbarnett/JetRecoChecks/11_13_2025/RawPrime_Replay_JetChecks_11_13_2025_ptcut20.root";
+void JetCheck_PbPb_DATA_lxplus(TString input_filelist, TString output){
+
+    // for applying JSON and Jet Selections from headers
+    JSON_handler dcs;
+    JetSelect js;
 
     // declaring variables //
 
@@ -26,6 +29,7 @@ void JetCheck_PbPb_DATA_lxplus(){
     // filter
     Int_t ppvF;
     Int_t pclustF;
+    Int_t pphfF;
 
     // jet momenta
     const Int_t nm = 100;
@@ -41,13 +45,6 @@ void JetCheck_PbPb_DATA_lxplus(){
     Float_t jtPfCEF[nm];
     Float_t jtPfNEF[nm];
     Float_t jtPfMUF[nm];
-
-    // multiplicites
-    Int_t jtPfCHM[nm];
-    Int_t jtPfNHM[nm];
-    Int_t jtPfCEM[nm];
-    Int_t jtPfNEM[nm];
-    Int_t jtPfMUM[nm];
     
     // initializing inclusive event histograms //
 
@@ -56,95 +53,59 @@ void JetCheck_PbPb_DATA_lxplus(){
     TH1F *hvz = new TH1F("hvz", "", nvzbins, vzlims[0], vzlims[1]);
     TH1I *hhiBin = new TH1I("hhiBin", "", nhibins, hibinlims[0], hibinlims[1]);
     TH1I *hnref = new TH1I("hnref", "", nrefbins, nreflims[0], nreflims[1]);
-
-    // filters
-    TH1I *hppvF = new TH1I("hppvF", "", ntrigbins, triglims[0], triglims[1]);
-    TH1I *hpclustF = new TH1I("hpclustF", "", ntrigbins, triglims[0], triglims[1]);
+    TH1I *hrun = new TH1I("hrun", "", nrunbins, hrunlims[0], hrunlims[1]);
 
     // declaring histograms //
 
     /// by eta
     // momenta
-    TH1F *hjetmom_eta[nmom][netabins];
-    TH2F *hjtetaphi_eta[netabins];
-    // PF fractions & multiplicities
-    TH2F *hjtpfFphi_eta[nfrac][netabins];
-    TH1F *hjtPfF_eta[nfrac][netabins];
-    TH1F *hjtPfM_eta[nmult][netabins];
-
+    TH1F *hjetmom_eta[nmom][nptcuts][netabins];
+    TH2F *hjtetaphi_eta[nptcuts][netabins];
+    // PF fractions
+    TH1F *hjtPfF_eta[nfrac][nptcuts][netabins];
     /// by hibin
-    TH1F *hjetmom_hibin[nmom][netabins][nhiBin];
-    TH2F *hjtetaphi_hibin[netabins][nhiBin];
-    TH2F *hjtpfFphi_hibin[nfrac][netabins][nhiBin];
-    TH1F *hjtPfF_hibin[nfrac][netabins][nhiBin];
-    TH1F *hjtPfM_hibin[nmult][netabins][nhiBin];
+    TH1F *hjetmom_hibin[nmom][nptcuts][netabins][nhiBin];
+    TH2F *hjtetaphi_hibin[nptcuts][netabins][nhiBin];
+    TH1F *hjtPfF_hibin[nfrac][nptcuts][netabins][nhiBin];
 
     // initializing histograms //
-    
-    // by eta
-    for(unsigned int b=0; b<netabins; b++){
+    TString hname;
 
-        // momenta
-        for(int hj=0; hj<nmom; hj++){
-            TString htitle0 = smom[hj]+htitles_byeta[b];
-            hjetmom_eta[hj][b] = new TH1F(htitle0, htitle0, nmombins[hj], nmomlo[hj], nmomhi[hj]);
-        }
-        
-        // eta phi map
-        TString htitle1 = "hjtetaphi"+htitles_byeta[b];
-        hjtetaphi_eta[b] = new TH2F(htitle1, htitle1, nhetabins, etalims[0], etalims[1], nphibins, philims[0], philims[1]);
-
-        // PF fractions & multiplicities
-        for(int hj=0; hj<nfrac; hj++){
-
-            // pf fraction vs phi map
-            TString htitle2 = "hjt"+sfrac[hj]+"phi"+htitles_byeta[b];
-            hjtpfFphi_eta[hj][b] = new TH2F(htitle2, htitle2, npfbins, pflims[0], pflims[1], nphibins, philims[0], philims[1]);
-
-            TString htitle3 = sfrac[hj]+htitles_byeta[b];
-            hjtPfF_eta[hj][b] = new TH1F(htitle3, htitle3, npfbins, pflims[0], pflims[1]);
-
-            TString htitle4 = smult[hj]+htitles_byeta[b];
-            hjtPfM_eta[hj][b] = new TH1F(htitle4, htitle4, npfmbins, pfmlims[0], pfmlims[1]);
-        }
-
-        // by hiBin
-        for(unsigned int hb=0; hb<nhiBin; hb++){
-        
+    // by pt cut
+    for(unsigned int p=0; p<nptcuts; p++){
+        // by eta
+        for(unsigned int b=0; b<netabins; b++){
+            // momenta
             for(int hj=0; hj<nmom; hj++){
-                TString htitle5 = smom[hj]+htitles_byeta[b]+htitles_byhibin[hb];
-                hjetmom_hibin[hj][b][hb] = new TH1F(htitle5, htitle5, nmombins[hj], nmomlo[hj], nmomhi[hj]);
+                hname = smom[hj]+htitles_byptcut[p]+htitles_byeta[b];
+                hjetmom_eta[hj][p][b] = new TH1F(hname, hname, nmombins[hj], nmomlo[hj], nmomhi[hj]);
             }
-
-            TString htitle6 = "hjtetaphi"+htitles_byeta[b]+htitles_byhibin[hb];
-            hjtetaphi_hibin[b][hb] = new TH2F(htitle6, htitle6, nhetabins, etalims[0], etalims[1], nphibins, philims[0], philims[1]);
-
+            // eta phi map
+            hname = ep+htitles_byptcut[p]+htitles_byeta[b];
+            hjtetaphi_eta[p][b] = new TH2F(hname, hname, nhetabins, etalims[0], etalims[1], nphibins, philims[0], philims[1]);
+            // PF fractions & multiplicities
             for(int hj=0; hj<nfrac; hj++){
-            
-                TString htitle7 = "hjt"+sfrac[hj]+"phi"+htitles_byeta[b]+htitles_byhibin[hb];
-                hjtpfFphi_hibin[hj][b][hb] = new TH2F(htitle7, htitle7, npfbins, pflims[0], pflims[1], nphibins, philims[0], philims[1]);
-
-                TString htitle8 = sfrac[hj]+htitles_byeta[b]+htitles_byhibin[hb];
-                hjtPfF_hibin[hj][b][hb] = new TH1F(htitle8, htitle8, npfbins, pflims[0], pflims[1]);
-
-                TString htitle9 = smult[hj]+htitles_byeta[b]+htitles_byhibin[hb];
-                hjtPfM_hibin[hj][b][hb] = new TH1F(htitle9, htitle9, npfmbins, pfmlims[0], pfmlims[1]);
+                hname = sfrac[hj]+htitles_byptcut[p]+htitles_byeta[b];
+                hjtPfF_eta[hj][p][b] = new TH1F(hname, hname, npfbins, pflims[0], pflims[1]);
+            }
+            // by hiBin
+            for(unsigned int hb=0; hb<nhiBin; hb++){
+                for(int hj=0; hj<nmom; hj++){
+                    hname = smom[hj]+htitles_byptcut[p]+htitles_byeta[b]+htitles_byhibin[hb];
+                    hjetmom_hibin[hj][p][b][hb] = new TH1F(hname, hname, nmombins[hj], nmomlo[hj], nmomhi[hj]);
+                }
+                hname = ep+htitles_byptcut[p]+htitles_byeta[b]+htitles_byhibin[hb];
+                hjtetaphi_hibin[p][b][hb] = new TH2F(hname, hname, nhetabins, etalims[0], etalims[1], nphibins, philims[0], philims[1]);
+                for(int hj=0; hj<nfrac; hj++){
+                    hname = sfrac[hj]+htitles_byptcut[p]+htitles_byeta[b]+htitles_byhibin[hb];
+                    hjtPfF_hibin[hj][p][b][hb] = new TH1F(hname, hname, npfbins, pflims[0], pflims[1]);
+                }
             }
         }
     }
 
-    // getting jet veto map //
-
-    // opening root file with map
-    TString sfVetoMap = "/eos/cms/store/group/phys_heavyions/nbarnett/Winter25Prompt25_RunCDE.root";
-    TFile *fvm = TFile::Open(sfVetoMap,"read");
-   
-    // getting map as 2d histogram
-    TString shVetoMap = "jetvetomap_all";
-    TH2D *hvetomap = (TH2D*)fvm->Get(shVetoMap);
-
     // getting list of root files to process
-    ifstream myfile(input_file_list);
+    ifstream myfile(input_filelist);
     string filename;
 
     // keeping track of how many files have been processed
@@ -152,7 +113,6 @@ void JetCheck_PbPb_DATA_lxplus(){
     
     // looping over root files from list
     while(getline(myfile, filename)){
-
         filenumber+=1;
 
         // reading and staging input file
@@ -195,6 +155,7 @@ void JetCheck_PbPb_DATA_lxplus(){
         // filter ttree
         ttrees[1]->SetBranchAddress(sFilters[0],&pclustF);
         ttrees[1]->SetBranchAddress(sFilters[1],&ppvF);
+        ttrees[1]->SetBranchAddress(sFilters[2],&pphfF);
 
         /// jet ttree
         // multiplicity
@@ -210,12 +171,6 @@ void JetCheck_PbPb_DATA_lxplus(){
         ttrees[2]->SetBranchAddress(sJetBranch[7],jtPfCEF);
         ttrees[2]->SetBranchAddress(sJetBranch[8],jtPfNEF);
         ttrees[2]->SetBranchAddress(sJetBranch[9],jtPfMUF);
-        // multiplicities
-        ttrees[2]->SetBranchAddress(sJetBranch[10],jtPfCHM);
-        ttrees[2]->SetBranchAddress(sJetBranch[11],jtPfNHM);
-        ttrees[2]->SetBranchAddress(sJetBranch[12],jtPfCEM);
-        ttrees[2]->SetBranchAddress(sJetBranch[13],jtPfNEM);
-        ttrees[2]->SetBranchAddress(sJetBranch[14],jtPfMUM);
 
         // for loop going over events in the trees
         for(unsigned int i=0; i<ttrees[0]->GetEntries(); i++){
@@ -225,108 +180,74 @@ void JetCheck_PbPb_DATA_lxplus(){
             ttrees[1]->GetEntry(i);
 
             // filling event cut histograms
-            hvz_unpassed_unweighted->Fill(vz);
             hvz_unpassed->Fill(vz);
-            hppvF->Fill(ppvF);
-            hpclustF->Fill(pclustF);
 
-            // manually applying JSON //
-
-            // example for run 399499
-            if((run==399499)&&((lumi<50)||(lumi>291))){continue;}
+            // applying JSON //
+            if(!dcs.isGood(run, lumi)){continue;}
 
             // checking if the event passes cuts
             // event cuts are primary vertex filter, cluster compatability filter, and |vz| < 15
-            if((ppvF==0)||(pclustF==0)||(TMath::Abs(vz)>15)){continue;}
+            if((ppvF==0)||(pclustF==0)||(pphfF==0)||(TMath::Abs(vz)>15)){continue;}
             // getting jet tree info if the event cuts are passed
             ttrees[2]->GetEntry(i);
 
             // filling event histograms
             hvz->Fill(vz);
-            hnref->Fill(nref);
             hhiBin->Fill(hiBin);
+            hrun->Fill(run);
+            hnref->Fill(nref);
 
             /// Skipping events without jets
             if((nref==0)||(jtpt[0]<=0)){continue;}
 
             // looping through all jets in each event
             for(unsigned int j=0; j<nref; j++){
-
-                // jet pt cut
-                if(jtpt[j]<ptcut){continue;}
-
-                // checking jet veto map 
-                Double_t vetomapval = hvetomap->GetBinContent(hvetomap->FindBin(jteta[j], jtphi[j]));
-                if(vetomapval!=0){continue;}
-
-                // Jet ID requirements
-                if((jtPfCHF[j]>=0.99)||(jtPfCEF[j]>=0.8)||(jtPfMUF[j]>=0.8)){continue;}
+                
+                // using header file for jet identification
+                if(!js.JetSelection(jteta[j], jtphi[j], jtPfCEF[j], jtPfNEF[j],jtPfMUF[j])){continue;}
                 
                 // filling histograms //
 
-                // by eta
-                for(unsigned int b=0; b<netabins; b++){
-                    if((TMath::Abs(jteta[j])<etalo[b])||(TMath::Abs(jteta[j])>etahi[b])){continue;}
+                for(unsigned int p=0; p<nptcuts; p++){
+                    if(jtpt[j]<ptcuts[p]){continue;}
 
-                    // jet momenta
-                    hjetmom_eta[0][b]->Fill(rawpt[j]);
-                    hjetmom_eta[1][b]->Fill(jtpt[j]);
-                    hjetmom_eta[2][b]->Fill(jteta[j]);
-                    hjetmom_eta[3][b]->Fill(jtphi[j]);
-                    hjtetaphi_eta[b]->Fill(jteta[j], jtphi[j]);
-
-                    // jet pf fractions vs phi
-                    hjtpfFphi_eta[0][b]->Fill(jtPfCHF[j], jtphi[j]);
-                    hjtpfFphi_eta[1][b]->Fill(jtPfNHF[j], jtphi[j]);
-                    hjtpfFphi_eta[2][b]->Fill(jtPfCEF[j], jtphi[j]);
-                    hjtpfFphi_eta[3][b]->Fill(jtPfNEF[j], jtphi[j]);
-                    hjtpfFphi_eta[4][b]->Fill(jtPfMUF[j], jtphi[j]);
-
-                    // jet pf fractions
-                    hjtPfF_eta[0][b]->Fill(jtPfCHF[j]);
-                    hjtPfF_eta[1][b]->Fill(jtPfNHF[j]);
-                    hjtPfF_eta[2][b]->Fill(jtPfCEF[j]);
-                    hjtPfF_eta[3][b]->Fill(jtPfNEF[j]);
-                    hjtPfF_eta[4][b]->Fill(jtPfMUF[j]);
-
-                    // jet pf multiplicities
-                    hjtPfM_eta[0][b]->Fill(jtPfCHM[j]);
-                    hjtPfM_eta[1][b]->Fill(jtPfNHM[j]);
-                    hjtPfM_eta[2][b]->Fill(jtPfCEM[j]);
-                    hjtPfM_eta[3][b]->Fill(jtPfNEM[j]);
-                    hjtPfM_eta[4][b]->Fill(jtPfMUM[j]);
-
-                    // by hibin
-                    for(int hb=0; hb<nhiBin; hb++){
-                        if((hiBin<hiBinlo[hb])||(hiBin>hiBinhi[hb])){continue;}
+                    for(unsigned int b=0; b<netabins; b++){
+                        if((TMath::Abs(jteta[j])<etalo[b])||(TMath::Abs(jteta[j])>etahi[b])){continue;}
 
                         // jet momenta
-                        hjetmom_hibin[0][b][hb]->Fill(rawpt[j]);
-                        hjetmom_hibin[1][b][hb]->Fill(jtpt[j]);
-                        hjetmom_hibin[2][b][hb]->Fill(jteta[j]);
-                        hjetmom_hibin[3][b][hb]->Fill(jtphi[j]);
-                        hjtetaphi_hibin[b][hb]->Fill(jteta[j], jtphi[j]);
-
-                        // jet pf fractions vs phi
-                        hjtpfFphi_hibin[0][b][hb]->Fill(jtPfCHF[j], jtphi[j]);
-                        hjtpfFphi_hibin[1][b][hb]->Fill(jtPfNHF[j], jtphi[j]);
-                        hjtpfFphi_hibin[2][b][hb]->Fill(jtPfCEF[j], jtphi[j]);
-                        hjtpfFphi_hibin[3][b][hb]->Fill(jtPfNEF[j], jtphi[j]);
-                        hjtpfFphi_hibin[4][b][hb]->Fill(jtPfMUF[j], jtphi[j]);
+                        hjetmom_eta[0][p][b]->Fill(rawpt[j]);
+                        hjetmom_eta[1][p][b]->Fill(jtpt[j]);
+                        hjetmom_eta[2][p][b]->Fill(jteta[j]);
+                        hjetmom_eta[3][p][b]->Fill(jtphi[j]);
+                        hjtetaphi_eta[p][b]->Fill(jteta[j], jtphi[j]);
 
                         // jet pf fractions
-                        hjtPfF_hibin[0][b][hb]->Fill(jtPfCHF[j]);
-                        hjtPfF_hibin[1][b][hb]->Fill(jtPfNHF[j]);
-                        hjtPfF_hibin[2][b][hb]->Fill(jtPfCEF[j]);
-                        hjtPfF_hibin[3][b][hb]->Fill(jtPfNEF[j]);
-                        hjtPfF_hibin[4][b][hb]->Fill(jtPfMUF[j]);
+                        hjtPfF_eta[0][p][b]->Fill(jtPfCHF[j]);
+                        hjtPfF_eta[1][p][b]->Fill(jtPfNHF[j]);
+                        hjtPfF_eta[2][p][b]->Fill(jtPfCEF[j]);
+                        hjtPfF_eta[3][p][b]->Fill(jtPfNEF[j]);
+                        hjtPfF_eta[4][p][b]->Fill(jtPfMUF[j]);
 
-                        // jet pf multiplicities
-                        hjtPfM_hibin[0][b][hb]->Fill(jtPfCHM[j]);
-                        hjtPfM_hibin[1][b][hb]->Fill(jtPfNHM[j]);
-                        hjtPfM_hibin[2][b][hb]->Fill(jtPfCEM[j]);
-                        hjtPfM_hibin[3][b][hb]->Fill(jtPfNEM[j]);
-                        hjtPfM_hibin[4][b][hb]->Fill(jtPfMUM[j]);
+                        // by hibin
+                        for(int hb=0; hb<nhiBin; hb++){
+                            if((hiBin<hiBinlo[hb])||(hiBin>hiBinhi[hb])){continue;}
+                            
+                            // leading jet momenta
+
+                            // jet momenta
+                            hjetmom_hibin[0][p][b][hb]->Fill(rawpt[j]);
+                            hjetmom_hibin[1][p][b][hb]->Fill(jtpt[j]);
+                            hjetmom_hibin[2][p][b][hb]->Fill(jteta[j]);
+                            hjetmom_hibin[3][p][b][hb]->Fill(jtphi[j]);
+                            hjtetaphi_hibin[p][b][hb]->Fill(jteta[j], jtphi[j]);
+
+                            // jet pf fractions
+                            hjtPfF_hibin[0][p][b][hb]->Fill(jtPfCHF[j]);
+                            hjtPfF_hibin[1][p][b][hb]->Fill(jtPfNHF[j]);
+                            hjtPfF_hibin[2][p][b][hb]->Fill(jtPfCEF[j]);
+                            hjtPfF_hibin[3][p][b][hb]->Fill(jtPfNEF[j]);
+                            hjtPfF_hibin[4][p][b][hb]->Fill(jtPfMUF[j]);
+                        }
                     }
                 }
             }
@@ -349,38 +270,25 @@ void JetCheck_PbPb_DATA_lxplus(){
     devt->cd();
     hvz_unpassed->Write();
     hvz->Write();
-    hppvF->Write();
+    hhiBin->Write();
+    hrun->Write();
     hnref->Write();
 
-
-    // jet histograms by eta 
-    for(unsigned int b=0; b<netabins; b++){
-        dji->cd(); 
-
-        // momenta
-        for(int hj=0; hj<nmom; hj++){hjetmom_eta[hj][b]->Write();}
-        hjtetaphi_eta[b]->Write();
-
-        // fractions & multiplicities
-        for(int hj=0; hj<nfrac; hj++){
-            hjtpfFphi_eta[hj][b]->Write();
-            hjtPfF_eta[hj][b]->Write();
-            hjtPfM_eta[hj][b]->Write();
-        }
-
-        // for each hibin
-        djh->cd();
-        for(int hb=0; hb<nhiBin; hb++){
-    
+    // jet histograms
+    for(unsigned int p=0; p<nptcuts; p++){
+        for(unsigned int b=0; b<netabins; b++){
+            dji->cd(); 
             // momenta
-            for(int hj=0; hj<nmom; hj++){hjetmom_hibin[hj][b][hb]->Write();}
-            hjtetaphi_hibin[b][hb]->Write();
-
-            // fractions & multiplicities
-            for(int hj=0; hj<nfrac; hj++){
-                hjtpfFphi_hibin[hj][b][hb]->Write();
-                hjtPfF_hibin[hj][b][hb]->Write();
-                hjtPfM_hibin[hj][b][hb]->Write();
+            for(int hj=0; hj<nmom; hj++){hjetmom_eta[hj][p][b]->Write();}
+            hjtetaphi_eta[p][b]->Write();
+            // fractions
+            for(int hj=0; hj<nfrac; hj++){hjtPfF_eta[hj][p][b]->Write();}
+            // for each hibin
+            djh->cd();
+            for(int hb=0; hb<nhiBin; hb++){
+                for(int hj=0; hj<nmom; hj++){hjetmom_hibin[hj][p][b][hb]->Write();}
+                hjtetaphi_hibin[p][b][hb]->Write();
+                for(int hj=0; hj<nfrac; hj++){hjtPfF_hibin[hj][p][b][hb]->Write();}
             }
         }
     }
