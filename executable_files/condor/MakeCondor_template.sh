@@ -7,9 +7,9 @@ filename="${2##*/}"
 
 # making a bash script to run the executble
 run_filename="run_$1.sh"
-if [[ "$executable" == *.py ]]; then
+if [[ "$filename" == *.py ]]; then
     cp /eos/cms/store/group/phys_heavyions/nbarnett/condor/run_py_template.sh ./$run_filename
-elif [[ "$executable" == *.C ]]; then
+elif [[ "$filename" == *.C ]]; then
     cp /eos/cms/store/group/phys_heavyions/nbarnett/condor/run_C_template.sh ./$run_filename
 fi
 sed -i "s|__EXECUTABLE_FILE__|`pwd`/${filename}|g" $run_filename
