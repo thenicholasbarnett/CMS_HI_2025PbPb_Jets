@@ -3,7 +3,6 @@
 #include "TTree.h"
 #include "TH1.h"
 
-// void nref_max_finder_data(TString input_file_list = "/afs/cern.ch/user/n/nbarnett/public/txt_files/forest_locations_2025/forests_RawPrime_Replay.txt", TString output = "/eos/cms/store/group/phys_heavyions/nbarnett/temp/11_10_2025/nref_RawPrime_Replay_11_10_2025.root"){
 void nref_max_finder_data(TString input_file_list, TString output){
 
     // declaring variables //
